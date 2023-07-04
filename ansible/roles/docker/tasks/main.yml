@@ -1,0 +1,42 @@
+---
+# tasks file for docker
+- name: Install Docker
+  ansible.builtin.apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - software-properties-common
+      - net-tools
+      - gnupg2
+- name: Add GPG key
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+- name: Add docker repository to apt
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+- name: Install apt docker
+  ansible.builtin.apt:
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+      - docker-compose
+- name: Check docker is active
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+- name: Ensure group "docker" exists
+  ansible.builtin.group:
+    name: docker
+    state: present
+- name: Adding ubuntu to docker group
+  ansible.builtin.user:
+    name: ubuntu
+    groups: docker
+    append: true

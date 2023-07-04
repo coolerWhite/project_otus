@@ -1,0 +1,6 @@
+---
+# handlers file for docker
+- name: Docker status
+  ansible.builtin.service:
+    name: docker
+    enabled: true
