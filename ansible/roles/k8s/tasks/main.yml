@@ -21,6 +21,8 @@
         path: /etc/systemd/system/cri-docker.service
         regexp: /usr/bin/cri-dockerd
         replace: /usr/local/bin/cri-dockerd
+    - name: Sed replace
+      ansible.builtin.shell: sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
     - name: Systemctl reload
       ansible.builtin.systemd:
         daemon_reload: true
