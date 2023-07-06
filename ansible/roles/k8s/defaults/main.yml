@@ -1,2 +1,4 @@
 ---
 # defaults file for k8s
+#username: 'root'
+#password: ''

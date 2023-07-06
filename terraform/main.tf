@@ -24,7 +24,7 @@ provider "yandex" {
 #}
 
 resource "yandex_compute_instance" "kuber" {
-  count = 3
+  count = 2
   name = "kuber-${count.index+1}"
   #hostname = "kuberVM-${count.index+1}"
   #depends_on = [ yandex_compute_disk.kuber-disk ]
