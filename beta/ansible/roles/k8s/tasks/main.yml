@@ -1,0 +1,184 @@
+---
+- name: Run cri-dockerd
+  block:
+    - name: Install local cri-docker
+      become: true
+      ansible.builtin.git:
+        repo: https://github.com/Mirantis/cri-dockerd.git
+        dest: /usr/local/bin/cri-docker
+        clone: true
+        version: master
+    - name: Cd cri-dockerd
+      ansible.builtin.shell: cd /usr/local/bin/cri-docker
+#    - name: Install usr/local/bin/cri-dockerd
+#      ansible.builtin.shell: sudo install -o root -g root -m 0755 cri-dockerd /usr/local/bin/cri-dockerd
+    - name: Install packaging
+      ansible.builtin.shell: sudo install packaging/systemd/* /etc/systemd/system/* -foe
+    - name: Sed
+      ansible.builtin.shell: sudo sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
+    - name: Daemon-reload
+      ansible.builtin.shell: sudo systemctl daemon-reload
+    - name: Cri-docker.service
+      ansible.builtin.shell: sudo systemctl enable cri-docker.service
+    - name: Cri-docker.socket
+      ansible.builtin.shell: sudo systemctl enable --now cri-docker.socket
+- name: Creat dir local cri-docker 
+  ansible.builtin.file:
+    path: /usr/local/bin/cri-docker
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+- name: Creat dir cri-docker 
+  ansible.builtin.file:
+    path: /usr/bin/cri-docker
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+- name: Install local cri-docker
+  ansible.builtin.git:
+    repo: https://github.com/Mirantis/cri-dockerd.git
+    dest: /usr/local/bin/cri-docker
+    clone: true
+    version: master
+- name: Install cri-docker
+  ansible.builtin.git:
+    repo: https://github.com/Mirantis/cri-dockerd.git
+    dest: /usr/bin/cri-docker
+    clone: true
+    version: master
+- name: Copy cri-docker.service
+  ansible.builtin.copy:
+    remote_src: true
+    src: /usr/local/bin/cri-docker/packaging/systemd/cri-docker.service
+    dest: /etc/systemd/system/cri-docker.service
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+- name: Copy cri-docker.socket
+  ansible.builtin.copy:
+    remote_src: true
+    src: /usr/local/bin/cri-docker/packaging/systemd/cri-docker.socket
+    dest: /etc/systemd/system/cri-docker.socket
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+
+- name: Systemctl reload
+  ansible.builtin.systemd:
+    daemon_reload: true
+    enabled: true
+    name: cri-docker.service
+- name: Enable cri-docker
+  ansible.builtin.shell: systemctl enable --now cri-docker.service
+- name: Add Google SDK
+
+# coppy script
+# tasks file for k8s
+- name: Copy cri-dockerd script
+  ansible.builtin.copy:
+    src: cri-dockerd.sh
+    dest: /home/ubuntu/cri-dockerd.sh
+    owner: root
+    group: root
+    mode: "777"
+- name: Run cri-dockerd script
+  ansible.builtin.script:
+    cmd: /home/ubuntu/cri-dockerd.sh
+    
+
+
+
+
+
+
+
+
+
+        - name: Systemctl reload
+      become: true
+      block:
+        - name: Enable cri-docker
+          ansible.builtin.systemd:
+            daemon_reload: true
+            name: cri-docker.service
+            enabled: true
+            state: started
+            force: true
+
+
+
+#######################################
+
+#######################################
+    - name: Add repo and Key
+  block:
+    - name: Add key
+      ansible.builtin.script: add_key.sh --some-arguments 1234
+    - name: Add repo
+      ansible.builtin.apt_repository:
+        repo: deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
+        filename: kubernetes.list
+    - name: Udate cache
+      ansible.builtin.apt:
+        update_cache: true
+- name: Install kublet kubeadm kubectl
+  ansible.builtin.apt:
+    pkg:
+      - kublet
+      - kubeadm
+      - kubectl
+- name: Hold kublet
+  ansible.builtin.dpkg_selections:
+    name: kublet
+    selection: hold
+- name: Hold kubeadm
+  ansible.builtin.dpkg_selections:
+    name: kubeadm
+    selection: hold
+- name: Hold kubectl
+  ansible.builtin.dpkg_selections:
+    name: kubectl
+    selection: hold
+- name: Run cri-dockerd
+  block:
+    - name: Wget tar
+      ansible.builtin.unarchive:
+        src: https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.4/cri-dockerd-0.3.4.amd64.tgz
+        dest: /usr/local/bin/
+        owner: root
+        group: root
+        remote_src: true
+    - name: Download cri-docker.service
+      ansible.builtin.get_url:
+        url: https://github.com/Mirantis/cri-dockerd/blob/master/packaging/systemd/cri-docker.service
+        dest: /etc/systemd/system/cri-docker.service
+        owner: root
+        group: root
+    - name: Download cri-docker.socket
+      ansible.builtin.get_url:
+        url: https://github.com/Mirantis/cri-dockerd/blob/master/packaging/systemd/cri-docker.socket
+        dest: /etc/systemd/system/cri-docker.socket
+        owner: root
+        group: root
+    - name: Replace cri-docker.service
+      become: true
+      ansible.builtin.replace:
+        path: /etc/systemd/system/cri-docker.service
+        regexp: /usr/bin/cri-dockerd
+        replace: /usr/local/bin/cri-dockerd
+#    - name: Sed replace
+#      ansible.builtin.shell: sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
+    - name: Systemctl reload
+      become: true
+      block:
+        - name: Daemon reload
+          ansible.builtin.systemd:
+            daemon_reload: true
+        - name: Enable cri-docker
+          ansible.builtin.systemd:
+            name: cri-docker.service
+            enabled: true
+        - name: Enable cri-docker2
+          ansible.builtin.shell: systemctl enable --now cri-docker.service

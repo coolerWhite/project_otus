@@ -5,6 +5,6 @@
   become: true
   gather_facts: true
   roles:
-#    - docker
-#    - gantsign.golang
-    - k8s
+    - docker
+    - gantsign.golang
+#    - k8s
