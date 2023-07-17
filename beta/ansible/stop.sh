@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd ../terraform 
+cd ../terraform
 terraform destroy --auto-approve
 cd ../ansible

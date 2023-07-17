@@ -13,4 +13,3 @@ sudo apt install cri-o cri-o-runc
 
 sudo systemctl enable crio.service
 sudo systemctl start crio.service
-

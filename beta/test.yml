@@ -1,11 +1,11 @@
-- name: Creat dir local cri-docker 
+- name: Creat dir local cri-docker
   ansible.builtin.file:
     path: /usr/local/bin/cri-docker
     state: directory
     owner: root
     group: root
     mode: "0755"
-- name: Creat dir cri-docker 
+- name: Creat dir cri-docker
   ansible.builtin.file:
     path: /usr/bin/cri-docker
     state: directory
@@ -62,7 +62,7 @@
 - name: Run cri-dockerd script
   ansible.builtin.script:
     cmd: /home/ubuntu/cri-dockerd.sh
-    
+
 
 
 

@@ -21,7 +21,7 @@ services:
     networks:
       - ui-net
       - cralwer-net
-  
+
   # app-bk:
   #   build:
   #     context: .
@@ -33,7 +33,7 @@ services:
   #     - RMQ_QUEUE =
   #     - RMQ_USERNAME = rmuser
   #     - RMQ_PASSWORD = rmpassword
-  #     - CHECK_INTERVAL = 
+  #     - CHECK_INTERVAL =
   #     - EXCLUDE_URLS =
   #   ports:
   #     - 81:8081
@@ -42,7 +42,7 @@ services:
   #   depends_on:
   #     - mongo
   #     - rabbit
-  
+
   mongo:
     image: mongo
     container_name: mongodb
@@ -57,7 +57,7 @@ services:
       MONGO_INITDB_DATABASE: SEARCH
       MONGODB_DATA_DIR: /data/db
       MONDODB_LOG_DIR: /dev/null
-    volumes: 
+    volumes:
       - mongo-data:/data/db
     networks:
       - ui-net
