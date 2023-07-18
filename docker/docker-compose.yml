@@ -1,3 +1,4 @@
+---
 version: '3'
 services:
   app-ui:
@@ -8,45 +9,47 @@ services:
     container_name: search_engine_ui
     environment:
       MONGO: mongo
-      MONGO_PORT: 27017
-      MONGODB_DATABASE: SEARCH
+      MONGO_PORT: '27017'
+      # MONGODB_DATABASE: SEARCH
       # MONGODB_USERNAME: root
       # MONGODB_PASSWORD: example
-      MONGODB_HOSTNAME: mongodb
+      # MONGODB_HOSTNAME: mongodb
     volumes:
       - ui-data:/var/www
     depends_on:
       - mongo
-      # - rabbit
+      - rabbit
     networks:
       - ui-net
-      - cralwer-net
 
-  # app-bk:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile-bk
-  #   environment:
-  #     - MONGO = //mongo
-  #     - MONGO_PORT = 27017
-  #     - RMQ_HOST = rabbitmq
-  #     - RMQ_QUEUE =
-  #     - RMQ_USERNAME = rmuser
-  #     - RMQ_PASSWORD = rmpassword
-  #     - CHECK_INTERVAL =
-  #     - EXCLUDE_URLS =
-  #   ports:
-  #     - 81:8081
-  #   volumes:
-  #     - ".:/app-bk"
-  #   depends_on:
-  #     - mongo
-  #     - rabbit
+  app-crawler:
+    build:
+      context: search_engine_crawler
+      dockerfile: Dockerfile
+    image: project-otus/app-crawler:latest
+    container_name: search_engine_crawler
+    environment:
+      MONGO: mongodb
+      MONGO_PORT: '27017'
+      RMQ_HOST: rabbitmq
+      RMQ_QUEUE: RABBIT-SEARCH
+      RMQ_USERNAME: rmuser
+      RMQ_PASSWORD: rmpassword
+      CHECK_INTERVAL: '10'
+      EXCLUDE_URLS: '.*github.com'
+    # ports:
+    #   - 81:8081
+    volumes:
+      - crawler-data:/search_engine_crawler
+    depends_on:
+      - mongo
+      - rabbit
+    networks:
+      - crawler-net
 
   mongo:
     image: mongo
     container_name: mongodb
-    # image: project-otus/mongodb:latest
     restart: always
     # You use the command property to define the command that will be executed when the container is started
     # will disable logging into the MongoDB shell without credentials, which will secure MongoDB by requiring authentication
@@ -61,52 +64,68 @@ services:
       - mongo-data:/data/db
     networks:
       - ui-net
-      # - cralwer-net
+      - crawler-net
 
-  webserver:
-    build:
-      context: nginx
-      dockerfile: Dockerfile
-    image: project-otus/nginx:latest
-    container_name: webserver-nginx
-    restart: unless-stopped
+  rabbit:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    restart: always
     environment:
-      APP_ENV: "prod"
-      APP_NAME: "webserver-nginx"
-      APP_DEBUG: "false"
-      SERVICE_NAME: "webserver-nginx"
-    ports:
-      - "80:80"
-      - "443:443"
+      RABBITMQ_NODENAME: RABBIT
+      RABBITMQ_DEFAULT_USER: rmuser
+      RABBITMQ_DEFAULT_PASS: rmpassword
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit disk_free_limit 2147483648
     volumes:
-      - nginx-data:/var/log/nginx
-    depends_on:
-      - app-ui
+      - ./rabbitmq-data:/var/lib/rabbitmq
+      - type: bind
+        source: ./rabbitmq/rabbitmq-defs.json
+        target: /etc/rabbitmq/rabbitmq-defs.json
+      - type: bind
+        source: ./rabbitmq/rabbitmq.config
+        target: /etc/rabbitmq/rabbitmq.config
+    ports:
+      - '15672:15672'
+      - '5672:5672'
     networks:
       - ui-net
+      - crawler-net
+
+  # webserver:
+  #   build:
+  #     context: nginx
+  #     dockerfile: Dockerfile
+  #   image: project-otus/nginx:latest
+  #   container_name: webserver-nginx
+  #   restart: unless-stopped
+  #   environment:
+  #     APP_ENV: "prod"
+  #     APP_NAME: "webserver-nginx"
+  #     APP_DEBUG: "false"
+  #     SERVICE_NAME: "webserver-nginx"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - nginx-data:/var/log/nginx
+  #   depends_on:
+  #     - app-ui
+  #   networks:
+  #     - ui-net
 
 networks:
   ui-net:
     driver: bridge
-  cralwer-net:
+  crawler-net:
     driver: bridge
-
 
 volumes:
   ui-data:
     driver: local
+  crawler-data:
+    driver: local
   mongo-data:
     driver: local
-  nginx-data:
+  rabbitmq-data:
     driver: local
-  # rabbit:
-  #   image: rabbitmq:3.10.7-management
-  #   hostname: rabbitmq
-  #   restart: always
-  #   environment:
-  #     - RABBITMQ_DEFAULT_USER=rmuser
-  #     - RABBITMQ_DEFAULT_PASS=rmpassword
-  #   volumes:
-  #     - ./rabbitmq:/var/lib/rabbitmq
-  #   ports:
-  #     - 15672:15672
+  # nginx-data:
+  #   driver: local

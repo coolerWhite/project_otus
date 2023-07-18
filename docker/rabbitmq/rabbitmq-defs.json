@@ -1,0 +1,32 @@
+{
+    "exchanges": [
+      {
+        "name": "RABBIT-SEARCH",
+        "vhost": "/",
+        "type": "fanout",
+        "durable": true,
+        "auto_delete": false,
+        "internal": false,
+        "arguments": {}
+      }
+    ],
+    "queues": [
+      {
+        "name": "RABBIT-SEARCH",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false,
+        "arguments": {}
+      }
+    ],
+    "bindings": [
+      {
+        "source": "RABBIT-SEARCH",
+        "vhost": "/",
+        "destination": "RABBIT-SEARCH",
+        "destination_type": "queue",
+        "routing_key": "*",
+        "arguments": {}
+      }
+    ]
+  }
