@@ -7,13 +7,6 @@ services:
       dockerfile: Dockerfile
     image: project-otus/app-ui:latest
     container_name: search_engine_ui
-    environment:
-      MONGO: mongo
-      MONGO_PORT: '27017'
-      # MONGODB_DATABASE: SEARCH
-      # MONGODB_USERNAME: root
-      # MONGODB_PASSWORD: example
-      # MONGODB_HOSTNAME: mongodb
     volumes:
       - ui-data:/var/www
     depends_on:
@@ -28,17 +21,6 @@ services:
       dockerfile: Dockerfile
     image: project-otus/app-crawler:latest
     container_name: search_engine_crawler
-    environment:
-      MONGO: mongodb
-      MONGO_PORT: '27017'
-      RMQ_HOST: rabbitmq
-      RMQ_QUEUE: RABBIT-SEARCH
-      RMQ_USERNAME: rmuser
-      RMQ_PASSWORD: rmpassword
-      CHECK_INTERVAL: '10'
-      EXCLUDE_URLS: '.*github.com'
-    # ports:
-    #   - 81:8081
     volumes:
       - crawler-data:/search_engine_crawler
     depends_on:
@@ -71,18 +53,15 @@ services:
     hostname: rabbitmq
     restart: always
     environment:
-      RABBITMQ_NODENAME: RABBIT
+      # RABBITMQ_NODENAME: RABBIT
       RABBITMQ_DEFAULT_USER: rmuser
       RABBITMQ_DEFAULT_PASS: rmpassword
-      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit disk_free_limit 2147483648
+      # RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit disk_free_limit 2147483648
     volumes:
-      - ./rabbitmq-data:/var/lib/rabbitmq
-      - type: bind
-        source: ./rabbitmq/rabbitmq-defs.json
-        target: /etc/rabbitmq/rabbitmq-defs.json
-      - type: bind
-        source: ./rabbitmq/rabbitmq.config
-        target: /etc/rabbitmq/rabbitmq.config
+      # - ./rabbitmq-data:/var/lib/rabbitmq
+      - ./rabbitmq/10-defaults.conf:/etc/rabbitmq/conf.d/10-defaults.conf
+      # - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+      - ./rabbitmq/rabbitmq-defs.json:/etc/rabbitmq/rabbitmq-defs.json
     ports:
       - '15672:15672'
       - '5672:5672'

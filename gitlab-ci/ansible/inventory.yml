@@ -1,0 +1,4 @@
+gitlab:
+  hosts:
+    docker:
+      ansible_host: 158.160.112.181

@@ -1,0 +1,84 @@
+---
+- name: Docker
+  hosts: docker
+  become: true
+  tasks:
+    - name: Install dependencies
+      ansible.builtin.apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - software-properties-common
+          - net-tools
+    - name: Add GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: Add docker repository to apt
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+    - name: Install docker
+      ansible.builtin.apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+          - docker-compose
+    - name: Check docker is active
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+    - name: Ensure group "docker" exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+    - name: Adding ubuntu to docker group
+      ansible.builtin.user:
+        name: ubuntu
+        groups: docker
+        append: true
+    - name: Add Data Volumes config
+      ansible.builtin.file:
+        path: /srv/gitlab/config
+        state: directory
+        mode: '0644'
+    - name: Add Data Volumes data
+      ansible.builtin.file:
+        path: /srv/gitlab/data
+        state: directory
+        mode: '0644'
+    - name: Add Data Volumes logs
+      ansible.builtin.file:
+        path: /srv/gitlab/logs
+        state: directory
+        mode: '0644'
+    - name: Copy docker-compose
+      ansible.builtin.copy:
+        src: /home/otus/project_otus/gitlab-ci/docker-compose.yml
+        dest: /srv/gitlab/docker-compose.yml
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+    - name: Start docker containerd.io
+      community.docker.docker_container:
+        name: web
+        hostname: gitlab.example.com
+        image: gitlab/gitlab-ce:latest
+        state: started
+        restart: true
+        env:
+          GITLAB_OMNIBUS_CONFIG: |
+            external_url 'http://158.160.112.181'
+        ports:
+          - '80:80'
+          - '443:443'
+          - '2222:22'
+        volumes:
+          - '/srv/gitlab/config:/etc/gitlab'
+          - '/srv/gitlab/logs:/var/log/gitlab'
+          - '/srv/gitlab/data:/var/opt/gitlab'

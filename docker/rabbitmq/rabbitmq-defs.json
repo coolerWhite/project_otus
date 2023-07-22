@@ -1,7 +1,20 @@
 {
+  "users": [
+    {
+     "name": "rmuser",
+     "password": "rmpassword",
+     "tags": "administrator"
+    },
+    {
+     "name": "adminuser",
+     "password_hash": "kI3GCqW5JLMJa4iX1lo7X4D6XbYqlLgxIs30+P6tENUV2POR",
+     "hashing_algorithm": "rabbit_password_hashing_sha256",
+     "tags": "administrator"
+    }
+   ],
     "exchanges": [
       {
-        "name": "RABBIT-SEARCH",
+        "name": "SEARCH-1",
         "vhost": "/",
         "type": "fanout",
         "durable": true,
@@ -10,9 +23,12 @@
         "arguments": {}
       }
     ],
+    "vhosts":[
+      {"name":"/"}
+  ],
     "queues": [
       {
-        "name": "RABBIT-SEARCH",
+        "name": "crawler",
         "vhost": "/",
         "durable": true,
         "auto_delete": false,
@@ -21,9 +37,9 @@
     ],
     "bindings": [
       {
-        "source": "RABBIT-SEARCH",
+        "source": "SEARCH-2",
         "vhost": "/",
-        "destination": "RABBIT-SEARCH",
+        "destination": "SEARCH-2",
         "destination_type": "queue",
         "routing_key": "*",
         "arguments": {}
