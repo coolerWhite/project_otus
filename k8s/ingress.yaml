@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-balacer
+spec:
+  ports:
+    # Порт сетевого балансировщика
+    - port: 80
+      name: plaintext
+      # Порт контейнера, на котором доступно приложение.
+      targetPort: 8000
+  selector:
+    app: crawler
+    component: ui
+  type: LoadBalancer
