@@ -1,0 +1,69 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot-deploy
+  labels:
+    app: crawler
+    component: bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crawler
+      component: bot
+  template:
+    metadata:
+      # name: bot-pod
+      labels:
+        app: crawler
+        component: bot
+    spec:
+      containers:
+        # для деплоя созданного контейнера
+        - name: crawler-bot
+          # yamllint disable-line rule:line-length
+          # image: cr.yandex/crpdjaf8gfis0d6k905r/coolerwhite/search_engine_bot:__VERSION__
+          image: cr.yandex/crpdjaf8gfis0d6k905r/coolerwhite/search_engine_crawler:a58ceaf6
+          # ports:
+          #   - containerPort: 8000
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: myapp-bot
+#   labels:
+#     app: crawler
+#     component: bot
+# spec:
+#   selector:
+#     app: crawler
+#     component: bot
+#   ports:
+#     - name: app-listener
+#       protocol: TCP
+#       # Port load balancer
+#       port: 80
+#       # Port POD
+#       targetPort: 80
+#   type: LoadBalancer
+# ---
+# apiVersion: autoscaling/v2
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: autoscaling-bot
+# spec:
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: bot
+#   minReplicas: 1
+#   maxReplicas: 3
+#   metrics:
+#     - type: Resource
+#       resource:
+#         name: cpu
+#         target:
+#           type: Utilization
+#           averageUtilization: 50

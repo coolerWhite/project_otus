@@ -1,0 +1,73 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  labels:
+    app: crawler
+    component: rabbit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crawler
+      component: rabbit
+  template:
+    metadata:
+      name: rabbit
+      labels:
+        app: crawler
+        component: rabbit
+    spec:
+    # Создаём контейнер с rabbit
+      containers:
+        - image: rabbitmq:3.10.7-management
+          name: rabbit
+          volumeMounts:
+            - name: rabbit-persistent-storage
+              mountPath: /var/lib/rabbitmq
+            # - name: rabbit-conf
+            #   mountPath: /etc/rabbitmq/rabbitmq-defs.json
+          # ports:
+          #   - containerPort: 8000
+      volumes:
+        - name: rabbit-persistent-storage
+          persistentVolumeClaim:
+            claimName: rabbit-pvc
+        # - name: rabbit-conf
+        #   configMap: rabbit-conf
+---
+# Создаём PersistentVolume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: rabbit-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-rabbit
+  labels:
+    app: crawler
+    component: rabbit
+spec:
+# Открываем порты, по которым будем работать с rabbit
+  ports:
+    - name: rbcont
+      port: 5672
+      protocol: TCP
+      targetPort: 5672
+    - name: rbui
+      port: 15672
+      protocol: TCP
+      targetPort: 15672
+  type: NodePort
+  selector:
+    app: crawler
+    component: rabbit

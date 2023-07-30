@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-configmap
+data:
+  SERVER_HOST: "0.0.0.0"
+  SERVER_PORT: "1337"
+  RABBITMQ_URL: "amqp://user:user@crawler-rabbitmq/"
+
+  DATABASE_HOST: crawler-mongodb
+  DATABASE_PORT: "27017"

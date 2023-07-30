@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbit-conf
+data:
+  rabbitmq-defs.json:
+    {
+    "users": [
+      {
+      "name": "rmuser",
+      "password": "rmpassword",
+      "tags": "administrator"
+      },
+      {
+      "name": "adminuser",
+      "password_hash": "kI3GCqW5JLMJa4iX1lo7X4D6XbYqlLgxIs30+P6tENUV2POR",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator"
+      }
+    ],
+      "exchanges": [
+        {
+          "name": "SEARCH-1",
+          "vhost": "/",
+          "type": "fanout",
+          "durable": true,
+          "auto_delete": false,
+          "internal": false,
+          "arguments": {}
+        }
+      ],
+      "vhosts":[
+        {"name":"/"}
+    ],
+      "queues": [
+        {
+          "name": "crawler",
+          "vhost": "/",
+          "durable": true,
+          "auto_delete": false,
+          "arguments": {}
+        }
+      ],
+      "bindings": [
+        {
+          "source": "SEARCH-2",
+          "vhost": "/",
+          "destination": "SEARCH-2",
+          "destination_type": "queue",
+          "routing_key": "*",
+          "arguments": {}
+        }
+      ]
+    }

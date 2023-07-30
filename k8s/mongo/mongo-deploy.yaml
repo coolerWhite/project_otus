@@ -1,7 +1,8 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo
+  name: mongodb
   labels:
     app: crawler
     component: mongo
@@ -22,11 +23,11 @@ spec:
       containers:
         - image: mongo
           name: mongo
-          volumeMounts:                       
+          volumeMounts:
             - name: mongo-persistent-storage
               mountPath: /data/db
       volumes:
-        - name: mongo-persistent-storage          
+        - name: mongo-persistent-storage
           persistentVolumeClaim:
             claimName: mongo-pvc
 ---
@@ -40,4 +41,21 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 10Gi                         
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-mongo
+  labels:
+    app: crawler
+    component: mongo
+spec:
+# Открываем порты, по которым будем работать с Монгой
+  ports:
+    - port: 27017
+      protocol: TCP
+      targetPort: 27017
+  selector:
+    app: crawler
+    component: mongo
