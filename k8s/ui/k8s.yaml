@@ -22,32 +22,12 @@ spec:
       containers:
         # для деплоя созданного контейнера
         - name: crawler-ui
-          # yamllint disable-line rule:line-length
-          # image: cr.yandex/crpdjaf8gfis0d6k905r/coolerwhite/search_engine_ui:__VERSION__
-          image: cr.yandex/crpdjaf8gfis0d6k905r/coolerwhite/search_engine_ui:1fe0f385
+          image: cr.yandex/crpdjaf8gfis0d6k905r/coolerwhite/search_engine_ui:__VERSION__
+          # image: cr.yandex/crpdjaf8gfis0d6k905r/coolerwhite/search_engine_ui:1fe0f385
           ports:
             - containerPort: 8000
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: myapp-ui
-  labels:
-    app: crawler
-    component: ui
-spec:
-  selector:
-    app: crawler
-    component: ui
-  ports:
-    - name: app-listener
-      protocol: TCP
-      # Port load balancer
-      port: 80
-      # Port POD
-      targetPort: 8000
-  type: LoadBalancer
+
 # ---
 # apiVersion: autoscaling/v2
 # kind: HorizontalPodAutoscaler

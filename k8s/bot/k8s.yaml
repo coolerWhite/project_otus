@@ -22,9 +22,7 @@ spec:
       containers:
         # для деплоя созданного контейнера
         - name: crawler-bot
-          # yamllint disable-line rule:line-length
-          # image: cr.yandex/crpdjaf8gfis0d6k905r/coolerwhite/search_engine_bot:__VERSION__
-          image: cr.yandex/crpdjaf8gfis0d6k905r/coolerwhite/search_engine_crawler:a58ceaf6
+          image: cr.yandex/crpdjaf8gfis0d6k905r/coolerwhite/search_engine_crawler:__VERSION__
           # ports:
           #   - containerPort: 8000
 

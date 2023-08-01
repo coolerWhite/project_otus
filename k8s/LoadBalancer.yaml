@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-ui
+  labels:
+    app: crawler
+    component: ui
+spec:
+  selector:
+    app: crawler
+    component: ui
+  ports:
+    - name: app-listener
+      protocol: TCP
+      # Port load balancer
+      port: 80
+      # Port POD
+      targetPort: 8000
+  type: LoadBalancer

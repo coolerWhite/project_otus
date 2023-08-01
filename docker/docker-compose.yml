@@ -69,28 +69,6 @@ services:
       - ui-net
       - crawler-net
 
-  # webserver:
-  #   build:
-  #     context: nginx
-  #     dockerfile: Dockerfile
-  #   image: project-otus/nginx:latest
-  #   container_name: webserver-nginx
-  #   restart: unless-stopped
-  #   environment:
-  #     APP_ENV: "prod"
-  #     APP_NAME: "webserver-nginx"
-  #     APP_DEBUG: "false"
-  #     SERVICE_NAME: "webserver-nginx"
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - nginx-data:/var/log/nginx
-  #   depends_on:
-  #     - app-ui
-  #   networks:
-  #     - ui-net
-
 networks:
   ui-net:
     driver: bridge
