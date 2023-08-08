@@ -75,8 +75,19 @@ Dockerfile собираем контейнер
 Разворачиваем LoadBalancer для UI и получаем IP для подключения порт 80
 `kubectl apply -f /k8s/ LoadBalancer.yaml`
 
-
 ### Этап 5
+
+Устанавливаем мониторинг
+Использовать будем Helm
+`helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install 48.3.1 prometheus-community/kube-prometheus-stack`
+
+Через port-forward попадаем в Grafana
+Login\Pass стандартные
+Импортируем любой графиг, которые хотим (исользовал этот ID: 315)
+
+### Этап 6
 Проверяем, что все сделали для сборки
 - [ ] подняли K8s cluster
 - [ ] подняли GitLab
@@ -87,7 +98,7 @@ Dockerfile собираем контейнер
 - [ ] развернут Mongodb
 - [ ] перенесли k8s.yaml в соответствующие репозитории
 - [ ] развернут LoadBalancer для UI
-- [ ]
+- [ ] Установлен Prometheus\Grafana
 - [ ]
 
 
